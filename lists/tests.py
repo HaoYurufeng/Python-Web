@@ -18,7 +18,8 @@ class HomePageTest(TestCase):
         request = HttpRequest()
         response = home_page(request)
         self.assertIn('A new list item', response.content.decode())
-        expected_html = render_to_string('home.html', {'new_item_text': 'A new list item'})
+        expected_html = render_to_string('home.html',
+            {'new_item_text': 'A new list item'})
         self.assertEqual(response.content.decode(), expected_html)
 
     def test_home_page_can_save_a_POST_request(self):
@@ -27,7 +28,15 @@ class HomePageTest(TestCase):
         request.POST['item_text'] = 'A new list item'
         
         response = home_page(request)
+        
+        self.assertEqual(Item.objects.count(), 1)
+        new_item = Item.objects.first()
+        self.assertEqual(new_item.text, 'A new list item')
+
         self.assertIn('A new list item', response.content.decode())
+        expected_html = render_to_string('home.html',
+            {'new_item_text': 'A new list item'})
+        self.assertEqual(response.content.decode(), expected_html)
 
 class ItemModelTest(TestCase):
     def test_saving_and_retrieving_items(self):
